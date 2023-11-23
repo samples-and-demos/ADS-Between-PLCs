@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.0">
+  <POU Name="MAIN_851" Id="{a73410e8-482e-441e-a4bd-50c69d3cf49b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN_851
+VAR
+	_ST_APIBetweenPLCRx AT%MW0: ST_APIBetweenPLC;
+	_ST_APIBetweenPLCTx : ST_APIBetweenPLC;
+	fbADSWRITE: ADSWRITE;
+	Trig: Ton;
+	sNetIdOfThOtherTCsystem: STRING :='10.122.128.1.1.1';
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Trig(in:=NOT trig.Q ,PT:=T#500MS);
+IF Trig.Q THEN
+	_ST_APIBetweenPLCTx._int:=_ST_APIBetweenPLCTx._int-1;
+END_IF
+_ST_APIBetweenPLCTx._String:=concat('Value=', int_TO_STRING(_ST_APIBetweenPLCTx._int));
+fbADSWRITE(
+	NETID:=sNetIdOfThOtherTCsystem, 
+	PORT:=852 , //othe rTC system will be 851 too!!!!
+	IDXGRP:=16#4020 ,
+	IDXOFFS:=16#0 , 
+	LEN:=SIZEOF(_ST_APIBetweenPLCTx) , 
+	SRCADDR:=ADR(_ST_APIBetweenPLCTx) , 
+	WRITE:=Trig.Q , 
+	TMOUT:= , 
+	BUSY=> , 
+	ERR=> , 
+	ERRID=> );]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN_851">
+      <LineId Id="3" Count="3" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="8" Count="4" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="14" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
